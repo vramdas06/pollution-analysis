@@ -1,0 +1,44 @@
+---
+title: "NY Data Analysis"
+author: "Vijetha Ramdas"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Analysis
+
+```{r}
+library(tidyverse)
+library(lubridate)
+
+data <- read_csv('ny_pollution.csv.gz')
+
+data$date <- ymd(data$date)
+data$year <- year(data$date)
+
+data = data |>
+  filter(year %in% c(1997, 2004)) 
+data |>
+  group_by(year) |>
+  summarise(mean_pollution = mean(pollution, na.rm = TRUE))
+```
+
+# Statement
+The mean pollution in New York in 2004 was lower than the mean pollution in New York in 1997.
+
+# Supporting Premise
+
+The first 3 quartiles of 2004 data are below the second quartile of the 1997 data based on the histograms below. Additionally, the right tail of the 2004 distribution is within the range of the 1997 data. This evidence supports our statement that the mean pollution in New York in 2004 was lower than the mean pollution in New York in 1997.
+
+```{r}
+data$year_fact <- as.factor(data$year)
+
+ggplot(data, aes(x = pollution)) +
+  geom_boxplot() +
+  facet_wrap(~ year_fact, ncol = 1)
+```
+
